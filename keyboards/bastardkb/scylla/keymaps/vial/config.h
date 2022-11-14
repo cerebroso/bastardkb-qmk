@@ -19,7 +19,7 @@
 
 #ifdef VIA_ENABLE
 /* VIA configuration. */
-#define DYNAMIC_KEYMAP_LAYER_COUNT 4
+#define DYNAMIC_KEYMAP_LAYER_COUNT 5
 
 #ifdef VIAL_ENABLE
 /** Vial configuration. */
