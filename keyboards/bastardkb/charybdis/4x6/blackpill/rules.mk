@@ -1,5 +1,6 @@
 # MCU name
 MCU = STM32F411
+BOARD = BLACKPILL_STM32_F411
 
 # Bootloader selection
 BOOTLOADER = stm32-dfu
@@ -23,13 +24,10 @@ RGBLIGHT_SUPPORTED = yes    # RGB underglow is supported, but not enabled by def
 RGB_MATRIX_ENABLE = yes     # Enable keyboard RGB matrix functionality
 RGB_MATRIX_DRIVER = WS2812
 
-# Charybdis is a split 4x6 keyboard with a maximum of 5 thumb keys (3 on the
-# trackball side).
 SPLIT_KEYBOARD = yes
 
 POINTING_DEVICE_ENABLE = yes # Enable trackball
 POINTING_DEVICE_DRIVER = pmw3360
-# https://qmk.fm/changes/2018-11-16-use-a-single-endpoint-for-hid-reports
 MOUSE_SHARED_EP = no # Unify multiple HID interfaces into a single Endpoint
 KEYBOARD_SHARED_EP = yes
 

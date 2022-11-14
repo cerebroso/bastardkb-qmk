@@ -18,6 +18,8 @@
  */
 
 #include "charybdis.h"
+#include "transactions.h"
+#include <string.h>
 
 #ifdef CONSOLE_ENABLE
 #    include "print.h"
@@ -174,10 +176,6 @@ void charybdis_set_pointer_dragscroll_enabled(bool enable) {
     maybe_update_pointing_device_cpi(&g_charybdis_config);
 }
 
-void pointing_device_init_kb(void) {
-    maybe_update_pointing_device_cpi(&g_charybdis_config);
-}
-
 /**
  * \brief Augment the pointing device behavior.
  *
@@ -245,10 +243,10 @@ static void debug_charybdis_config_to_console(charybdis_config_t* config) {
     dprintf("(charybdis) process_record_kb: config = {\n"
             "\traw = 0x%X,\n"
             "\t{\n"
-            "\t\tis_dragscroll_enabled=%b\n"
-            "\t\tis_sniping_enabled=%b\n"
-            "\t\tdefault_dpi=0x%X (%ld)\n"
-            "\t\tsniping_dpi=0x%X (%ld)\n"
+            "\t\tis_dragscroll_enabled=%u\n"
+            "\t\tis_sniping_enabled=%u\n"
+            "\t\tdefault_dpi=0x%X (%u)\n"
+            "\t\tsniping_dpi=0x%X (%u)\n"
             "\t}\n"
             "}\n",
             config->raw, config->is_dragscroll_enabled, config->is_sniping_enabled, config->pointer_default_dpi, get_pointer_default_dpi(config), config->pointer_sniping_dpi, get_pointer_sniping_dpi(config));
@@ -316,7 +314,9 @@ bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
     }
 #        endif // !MOUSEKEY_ENABLE
 #    endif     // POINTING_DEVICE_ENABLE
-    debug_charybdis_config_to_console(&g_charybdis_config);
+    if ((keycode >= POINTER_DEFAULT_DPI_FORWARD && keycode < CHARYBDIS_SAFE_RANGE) || IS_MOUSEKEY(keycode)) {
+        debug_charybdis_config_to_console(&g_charybdis_config);
+    }
     return true;
 }
 
@@ -331,9 +331,55 @@ void matrix_init_kb(void) {
     read_charybdis_config_from_eeprom(&g_charybdis_config);
     matrix_init_user();
 }
-#endif // POINTING_DEVICE_ENABLE
 
-#ifdef __arm__
+#    ifdef CHARYBDIS_CONFIG_SYNC
+void charybdis_config_sync_handler(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+    if (initiator2target_buffer_size == sizeof(g_charybdis_config)) {
+        memcpy(&g_charybdis_config, initiator2target_buffer, sizeof(g_charybdis_config));
+    }
+}
+#    endif
+
+void keyboard_post_init_kb(void) {
+    maybe_update_pointing_device_cpi(&g_charybdis_config);
+#    ifdef CHARYBDIS_CONFIG_SYNC
+    transaction_register_rpc(RPC_ID_KB_CONFIG_SYNC, charybdis_config_sync_handler);
+#    endif
+    keyboard_post_init_user();
+}
+
+#    ifdef CHARYBDIS_CONFIG_SYNC
+void housekeeping_task_kb(void) {
+    if (is_keyboard_master()) {
+        // Keep track of the last state, so that we can tell if we need to propagate to slave.
+        static charybdis_config_t last_charybdis_config = {0};
+        static uint32_t           last_sync             = 0;
+        bool                      needs_sync            = false;
+
+        // Check if the state values are different.
+        if (memcmp(&g_charybdis_config, &last_charybdis_config, sizeof(g_charybdis_config))) {
+            needs_sync = true;
+            memcpy(&last_charybdis_config, &g_charybdis_config, sizeof(g_charybdis_config));
+        }
+        // Send to slave every 500ms regardless of state change.
+        if (timer_elapsed32(last_sync) > 500) {
+            needs_sync = true;
+        }
+
+        // Perform the sync if requested.
+        if (needs_sync) {
+            if (transaction_rpc_send(RPC_ID_KB_CONFIG_SYNC, sizeof(g_charybdis_config), &g_charybdis_config)) {
+                last_sync = timer_read32();
+            }
+        }
+    }
+    // No need to invoke the user-specific callback, as it's been called
+    // already.
+}
+#    endif // CHARYBDIS_CONFIG_SYNC
+#endif     // POINTING_DEVICE_ENABLE
+
+#if defined(KEYBOARD_bastardkb_charybdis_3x5_blackpill) || defined(KEYBOARD_bastardkb_charybdis_4x6_blackpill)
 void keyboard_pre_init_kb(void) {
     setPinInputHigh(A0);
     keyboard_pre_init_user();
@@ -345,4 +391,4 @@ void matrix_scan_kb(void) {
     }
     matrix_scan_user();
 }
-#endif // __arm__
+#endif // KEYBOARD_bastardkb_charybdis_3x5_blackpill || KEYBOARD_bastardkb_charybdis_4x6_blackpill

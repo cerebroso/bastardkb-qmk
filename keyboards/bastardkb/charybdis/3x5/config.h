@@ -18,36 +18,20 @@
 
 #pragma once
 
-#include "config_common.h"
-
 /* Key matrix configuration. */
 #define MATRIX_ROWS 8 // Rows are doubled-up.
 #define MATRIX_COLS 5
 
 #define DIODE_DIRECTION ROW2COL
 
-/* Disable action features. */
-#define NO_ACTION_MACRO    // Disable old-style macro handling.
-#define NO_ACTION_FUNCTION // Disable old-style function handling.
-
-/* Set 0 if debouncing isn't needed. */
-#define DEBOUNCE 5
-
 /* Trackball angle adjustment. */
 #define ROTATIONAL_TRANSFORM_ANGLE -25
 
 /* RGB settings. */
-#define RGBLED_NUM 36
-#define RGBLED_SPLIT \
-    { 18, 18 }
-
-/* RGB matrix support. */
 #ifdef RGB_MATRIX_ENABLE
-#    define SPLIT_TRANSPORT_MIRROR
+#    define RGBLED_NUM 36
+#    define RGBLED_SPLIT \
+        { 18, 18 }
 #    define DRIVER_LED_TOTAL RGBLED_NUM
 #    define RGB_MATRIX_SPLIT RGBLED_SPLIT
-#    define RGB_MATRIX_MAXIMUM_BRIGHTNESS 50
-#    define RGB_MATRIX_STARTUP_VAL RGB_MATRIX_MAXIMUM_BRIGHTNESS
-#    define RGB_DISABLE_WHEN_USB_SUSPENDED
-#    define RGB_MATRIX_KEYPRESSES
 #endif

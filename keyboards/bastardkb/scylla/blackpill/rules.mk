@@ -1,5 +1,6 @@
 # MCU name
 MCU = STM32F411
+BOARD = BLACKPILL_STM32_F411
 
 # Bootloader selection
 BOOTLOADER = stm32-dfu
@@ -25,7 +26,6 @@ RGB_MATRIX_DRIVER = WS2812  # RGB matrix driver support
 
 SPLIT_KEYBOARD = yes
 
-# https://qmk.fm/changes/2018-11-16-use-a-single-endpoint-for-hid-reports
 MOUSE_SHARED_EP = no # Unify multiple HID interfaces into a single Endpoint
 KEYBOARD_SHARED_EP = yes
 

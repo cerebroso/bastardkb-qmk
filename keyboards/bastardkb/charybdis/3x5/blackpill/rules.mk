@@ -1,5 +1,6 @@
 # MCU name
 MCU = STM32F411
+BOARD = BLACKPILL_STM32_F411
 
 # Bootloader selection
 BOOTLOADER = stm32-dfu
@@ -23,14 +24,11 @@ RGBLIGHT_SUPPORTED = yes    # RGB underglow is supported, but not enabled by def
 RGB_MATRIX_ENABLE = yes     # Enable keyboard RGB matrix functionality
 RGB_MATRIX_DRIVER = WS2812
 
-# Charybdis nano is a split 3x5 keyboard with a maximum of 3 thumb keys (2 on
-# the trackball side).
 SPLIT_KEYBOARD = yes
-LAYOUTS = split_3x5_3 # Support community layout, in particular Manna-Harbour's Miryoku layout
+LAYOUTS = split_3x5_3
 
 POINTING_DEVICE_ENABLE = yes # Enable trackball
 POINTING_DEVICE_DRIVER = pmw3360
-# https://qmk.fm/changes/2018-11-16-use-a-single-endpoint-for-hid-reports
 MOUSE_SHARED_EP = no # Unify multiple HID interfaces into a single Endpoint
 KEYBOARD_SHARED_EP = yes
 
