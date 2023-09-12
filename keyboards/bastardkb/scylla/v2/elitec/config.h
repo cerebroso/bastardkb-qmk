@@ -23,7 +23,6 @@
 #define MATRIX_COL_PINS \
     { F6, F5, B6, D7, E6, B4 }
 
-
 /* serial.c configuration (for split keyboard). */
 #define SOFT_SERIAL_PIN D2
 

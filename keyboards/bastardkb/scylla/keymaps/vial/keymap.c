@@ -30,3 +30,60 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //
 //     return true;
 // };
+HSV current_color;
+HSV initial_color = {253, 212, 255};
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+	switch (get_highest_layer(state)) {
+		case 0:
+			rgb_matrix_sethsv_noeeprom(initial_color.h, initial_color.s, current_color.v);
+			break;
+		case 1:
+			current_color = rgb_matrix_get_hsv();
+
+			rgb_matrix_sethsv_noeeprom(0, 255, current_color.v);
+			break;
+		case 2:
+			current_color = rgb_matrix_get_hsv();
+
+			//h 255 is 360
+			rgb_matrix_sethsv_noeeprom(244, 170, current_color.v);
+			break;
+		case 4:
+			current_color = rgb_matrix_get_hsv();
+
+			rgb_matrix_sethsv_noeeprom(140, 255, current_color.v);
+			break;
+		default:
+			rgb_matrix_sethsv_noeeprom(initial_color.h, initial_color.s, current_color.v);
+			break;
+	}
+	return state;
+}
+
+void keyboard_post_init_user(void) {
+	// HSV initial_color = rgb_matrix_get_hsv();
+
+  // Call the post init code.
+  rgb_matrix_sethsv(initial_color.h, initial_color.s, initial_color.v);
+}
+
+// void suspend_power_down_user(void) {
+//   rgb_matrix_sethsv_noeeprom(0, 0, 0);
+// 	// rgb_matrix_set_suspend_state(true);
+// }
+
+// void suspend_wakeup_init_user(void) {
+// 	rgb_matrix_sethsv(253, 212, current_color.v);
+//   // rgb_matrix_set_suspend_state(false);
+// }
+
+// void suspend_power_down_keymap(void) {
+// 	rgb_matrix_set_suspend_state(true);
+//   rgb_matrix_sethsv(0, 0, 0);
+// }
+
+// void suspend_wakeup_init_keymap(void) {
+// 	rgb_matrix_set_suspend_state(false);
+//   rgb_matrix_sethsv(0, 0, 0);
+// }
