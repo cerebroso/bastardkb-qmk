@@ -49,6 +49,11 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 			//h 255 is 360
 			rgb_matrix_sethsv_noeeprom(244, 170, current_color.v);
 			break;
+		case 3:
+			current_color = rgb_matrix_get_hsv();
+
+			rgb_matrix_sethsv_noeeprom(229, 241, current_color.v);
+			break;
 		case 4:
 			current_color = rgb_matrix_get_hsv();
 
